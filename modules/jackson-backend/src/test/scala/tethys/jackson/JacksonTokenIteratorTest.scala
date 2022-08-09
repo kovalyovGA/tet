@@ -1,13 +1,33 @@
 package tethys.jackson
 
-import tethys._
-import tethys.commons.TokenNode._
+import tethys.{JsonObjectWriter, *}
+import tethys.commons.TokenNode.*
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
+import tethys.derivation.builder.{Discriminator, FieldStyle, ReaderBuilder, WriterBuilder}
+import tethys.derivation.reader
+import tethys.writers.tokens.TokenWriter
 
 class JacksonTokenIteratorTest extends AnyFlatSpec with Matchers {
 
   behavior of "JacksonTokenIterator"
+
+  it should "brah" in {
+    import derivation.utils.*
+    case class B(x: String, y: Int)
+    case class C(b: B, z: Boolean)
+
+    given JsonReader[B] = JsonReader.macroReader[B]
+    given JsonReader[C] = JsonReader.macroReader[C]
+
+    println("""{"x": "123", "y": 5}""".jsonAs[B])
+    println("""{"z": true, "b": {"y": 5, "x": "123"}}""".jsonAs[C])
+
+
+    //show(ReaderBuilder[B].extract(_.x).as[Option[String]](_.getOrElse("x")), ShowMode.Tree)
+    //show(Discriminator[Test].by(_.strLala), ShowMode.Code)
+  }
+
 
   it should "properly iterate over json string" in {
     val json = """{"a":1,"b":["s",true,{"a":null},1.0,false]}"""

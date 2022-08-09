@@ -2,11 +2,13 @@ package tethys.readers
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.flatspec.AnyFlatSpec
-import tethys.JsonReader
+import tethys.{JsonObjectWriter, JsonReader, JsonWriterOps, TokenIteratorOps}
 import tethys.commons.{Token, TokenNode}
-import tethys.commons.TokenNode._
-import tethys.readers.JsonReaderBuilderTest._
+import tethys.commons.TokenNode.*
+import tethys.readers.JsonReaderBuilderTest.*
 import tethys.readers.tokens.QueueIterator
+
+import scala.util.Try
 
 class JsonReaderBuilderTest extends AnyFlatSpec with Matchers {
   behavior of "JsonReaderBuilder"
@@ -91,7 +93,8 @@ class JsonReaderBuilderTest extends AnyFlatSpec with Matchers {
         .buildStrictReader(i => B(i.getOrElse(0)))
     }
 
-    the [ReaderError] thrownBy read[B](obj("j" -> 1)) should have message "Illegal json at '[ROOT]': unexpected field 'j', expected one of 'i'"
+    scala.util.Try(read[B](obj("j" -> 1))).failed.get.asInstanceOf[ReaderError]
+      .getMessage shouldBe "Illegal json at '[ROOT]': unexpected field 'j', expected one of 'i'"
   }
 
   it should "allow to build reader with more than 22 fields" in {

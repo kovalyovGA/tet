@@ -1,16 +1,23 @@
+lazy val versionsWithoutScala3 = Seq("2.12.15", "2.13.8")
+
+lazy val only3 = Seq("3.1.2")
+
+lazy val versions = versionsWithoutScala3 ++ only3
+
 lazy val commonSettings = Seq(
   version := "0.26.0",
   organization := "com.tethys-json",
-  scalaVersion := "2.12.15",
-  crossScalaVersions := Seq("2.12.15", "2.13.8"),
+  scalaVersion := "3.1.2",
+  crossScalaVersions := only3,
   Compile / unmanagedSourceDirectories ++= {
     def extraDirs(suffix: String) = Seq(file(sourceDirectory.value.getPath + "/main/scala" + suffix))
-
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, y)) if y <= 12 =>
         extraDirs("-2.12-")
       case Some((2, y)) if y >= 13 =>
         extraDirs("-2.13+")
+      case Some((3, _))  =>
+        extraDirs("-3.0+")
       case _ => Nil
     }
   },
@@ -86,6 +93,7 @@ lazy val `macro-derivation` = project.in(modules / "macro-derivation")
   .settings(testSettings)
   .settings(
     name := "tethys-derivation",
+    crossScalaVersions := versionsWithoutScala3,
     libraryDependencies ++= Seq(
       "org.scala-lang" % "scala-compiler" % scalaVersion.value % Provided
     )
@@ -93,8 +101,24 @@ lazy val `macro-derivation` = project.in(modules / "macro-derivation")
   .dependsOn(core)
 
 lazy val jacksonSettings = Seq(
-  Compile / unmanagedSourceDirectories += modules / "jackson-backend" / "src" / "main",
-  Test / unmanagedSourceDirectories    += modules / "jackson-backend" / "src" / "test",
+  Compile / unmanagedSourceDirectories += modules / "jackson-backend" / "src" / "main" / "scala",
+  Compile / unmanagedSourceDirectories += (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, y)) if y <= 12 =>
+      modules / "jackson-backend" / "src" / "main" / "scala-2.12-"
+    case Some((2, y)) if y >= 13 =>
+      modules / "jackson-backend" / "src" / "main" / "scala-2.13+"
+    case Some((_, _))  =>
+      modules / "jackson-backend" / "src" / "main" / "scala-3.0+"
+  }),
+  Test / unmanagedSourceDirectories += modules / "jackson-backend" / "src" / "test" / "scala",
+  Test / unmanagedSourceDirectories += (CrossVersion.partialVersion(scalaVersion.value) match {
+    case Some((2, y)) if y <= 12 =>
+      modules / "jackson-backend" / "src" / "test" / "scala-2.12-"
+    case Some((2, y)) if y >= 13 =>
+      modules / "jackson-backend" / "src" / "test" / "scala-2.13+"
+    case Some((_, _))  =>
+      modules / "jackson-backend" / "src" / "test" / "scala-3.0+"
+  }),
   Test / unmanagedResourceDirectories  += modules / "jackson-backend" / "src" / "test" / "resources"
 )
 
@@ -127,6 +151,7 @@ lazy val circe = project.in(modules / "circe")
   .settings(testSettings)
   .settings(
     name := "tethys-circe",
+    crossScalaVersions := versionsWithoutScala3,
     libraryDependencies ++= Seq(
       "io.circe" %% "circe-core" % "0.14.1"
     )
@@ -139,7 +164,7 @@ lazy val json4s = project.in(modules / "json4s")
   .settings(
     name := "tethys-json4s",
     libraryDependencies ++= Seq(
-      "org.json4s" %% "json4s-core" % "4.0.3"
+      "org.json4s" %% "json4s-ast" % "4.0.3"
     )
   )
   .dependsOn(core)
@@ -149,6 +174,7 @@ lazy val enumeratum = project.in(modules / "enumeratum")
   .settings(testSettings)
   .settings(
     name := "tethys-enumeratum",
+    crossScalaVersions := versionsWithoutScala3,
     libraryDependencies ++= Seq(
       "com.beachape" %% "enumeratum" % "1.7.0"
     )
@@ -160,6 +186,7 @@ lazy val refined = project.in(modules / "refined")
   .settings(testSettings)
   .settings(
     name := "tethys-refined",
+    crossScalaVersions := versionsWithoutScala3,
     libraryDependencies ++= Seq(
       "eu.timepit" %% "refined" % "0.9.28"
     )
@@ -170,6 +197,7 @@ lazy val benchmarks = project.in(modules / "benchmarks")
   .settings(commonSettings)
   .settings(
     publishTo := None,
+    crossScalaVersions := versionsWithoutScala3,
     libraryDependencies ++= Seq(
       "io.spray"          %% "spray-json"       % "1.3.6",
       "org.json4s"        %% "json4s-native"    % "3.6.10",

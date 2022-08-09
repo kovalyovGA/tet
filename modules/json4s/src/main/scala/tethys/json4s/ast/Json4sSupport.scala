@@ -32,8 +32,8 @@ trait Json4sSupport {
 
   implicit lazy val json4sJValueWriter: JsonWriter[JValue] = new JsonWriter[JValue] {
     override def write(value: JValue, tokenWriter: TokenWriter): Unit = value match {
-      case JNothing => JsonWriter[JNothing.type].write(JNothing, tokenWriter)
-      case JNull => JsonWriter[JNull.type].write(JNull, tokenWriter)
+      case JNothing => json4sJNothingWriter.write(JNothing, tokenWriter)
+      case JNull => json4sJNullWriter.write(JNull, tokenWriter)
       case x: JString => JsonWriter[JString].write(x, tokenWriter)
       case x: JDouble => JsonWriter[JDouble].write(x, tokenWriter)
       case x: JDecimal => JsonWriter[JDecimal].write(x, tokenWriter)
@@ -46,11 +46,11 @@ trait Json4sSupport {
     }
   }
 
-  implicit lazy val json4sJStringReader: JsonReader[JString] = JsonReader[String].map(JString)
-  implicit lazy val json4sJDoubleReader: JsonReader[JDouble] = JsonReader[Double].map(JDouble)
-  implicit lazy val json4sJDecimalReader: JsonReader[JDecimal] = JsonReader[BigDecimal].map(JDecimal)
-  implicit lazy val json4sJLongReader: JsonReader[JLong] = JsonReader[Long].map(JLong)
-  implicit lazy val json4sJIntReader: JsonReader[JInt] = JsonReader[BigInt].map(JInt)
+  implicit lazy val json4sJStringReader: JsonReader[JString] = JsonReader[String].map(JString(_))
+  implicit lazy val json4sJDoubleReader: JsonReader[JDouble] = JsonReader[Double].map(JDouble(_))
+  implicit lazy val json4sJDecimalReader: JsonReader[JDecimal] = JsonReader[BigDecimal].map(JDecimal(_))
+  implicit lazy val json4sJLongReader: JsonReader[JLong] = JsonReader[Long].map(JLong(_))
+  implicit lazy val json4sJIntReader: JsonReader[JInt] = JsonReader[BigInt].map(JInt(_))
   implicit lazy val json4sJBoolReader: JsonReader[JBool] = JsonReader[Boolean].map(b => if(b) JBool.True else JBool.False)
   implicit lazy val json4sJObjectReader: JsonReader[JObject] = new JsonReader[JObject] {
     override def read(it: TokenIterator)(implicit fieldName: FieldName): JObject = {
@@ -73,8 +73,6 @@ trait Json4sSupport {
       }
     }
   }
-  implicit lazy val json4sJArrayReader: JsonReader[JArray] = JsonReader[List[JValue]].map(JArray)
-  implicit lazy val json4sJSetReader: JsonReader[JSet] = JsonReader[Set[JValue]].map(JSet)
 
   implicit lazy val json4sJValueReader: JsonReader[JValue] = new JsonReader[JValue] {
     override def read(it: TokenIterator)(implicit fieldName: FieldName): JValue = {
@@ -101,4 +99,8 @@ trait Json4sSupport {
       else ReaderError.wrongJson(s"Unexpected token found: $token")(fieldName)
     }
   }
+
+  implicit lazy val json4sJArrayReader: JsonReader[JArray] = JsonReader[List[JValue]].map(JArray(_))
+  implicit lazy val json4sJSetReader: JsonReader[JSet] = JsonReader[Set[JValue]].map(JSet(_))
+
 }

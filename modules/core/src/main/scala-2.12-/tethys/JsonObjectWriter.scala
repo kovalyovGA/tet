@@ -1,5 +1,6 @@
 package tethys
 
+import tethys.JsonWriter
 import tethys.commons.LowPriorityInstance
 import tethys.writers.tokens.TokenWriter
 

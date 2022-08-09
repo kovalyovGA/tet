@@ -20,6 +20,18 @@ class AutoReaderDerivationTest extends AnyFlatSpec with Matchers {
 
 
   behavior of "auto derivation"
+
+  it should "brah" in {
+    println(read[JsonTreeTestData](obj(
+      "a" -> 2,
+      "b" -> true,
+      "a" -> 1,
+      "c" -> obj(
+        "d" -> obj(
+          "a" -> 2
+        )
+      ))))
+  }
   it should "derive readers for simple case class hierarchy" in {
     read[JsonTreeTestData](obj(
       "a" -> 1,

@@ -1,7 +1,9 @@
 package tethys.jackson
 
-import com.fasterxml.jackson.core.JsonGenerator
-import tethys.writers.tokens.TokenWriter
+import com.fasterxml.jackson.core.{JsonFactory, JsonGenerator}
+import tethys.writers.tokens.{TokenWriter, TokenWriterProducer}
+
+import java.io.Writer
 
 class JacksonTokenWriter(jsonGenerator: JsonGenerator) extends TokenWriter {
   override def writeArrayStart(): JacksonTokenWriter.this.type = {

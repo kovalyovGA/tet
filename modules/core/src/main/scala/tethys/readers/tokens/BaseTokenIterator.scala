@@ -7,6 +7,7 @@ import tethys.readers.tokens.TokenIterator.CopySupport
 import scala.annotation.tailrec
 import scala.collection.mutable
 import scala.collection.immutable
+import tethys.commons.Token
 
 trait BaseTokenIterator extends TokenIterator {
   override def next(): this.type = {

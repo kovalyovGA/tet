@@ -22,7 +22,7 @@ trait WriterDerivation
   private val tokenWriterType = tq"${typeOf[TokenWriter]}"
   private val tokenWriterTerm = TermName("tokenWriter")
   private val jsonWriterType = tq"$tethysPack.JsonWriter"
-  private val jsonObjectWriterType = tq"$tethysPack.JsonObjectWriter"
+  private val jsonObjectWriterType = tq"$tethysPack.tethys.JsonObjectWriter"
 
   def deriveWriter[A: WeakTypeTag]: Expr[JsonObjectWriter[A]] = {
     val description = MacroWriteDescription(

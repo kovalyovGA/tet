@@ -45,7 +45,7 @@ package object tethys {
   implicit class ReaderReaderOps(val reader: Reader) extends AnyVal {
     def readJson[A](implicit jsonReader: JsonReader[A], producer: TokenIteratorProducer): Either[ReaderError, A] = {
       implicit val root: FieldName = FieldName()
-      producer.fromReader(reader).right.flatMap(_.readJson[A])
+      producer.fromReader(reader).flatMap(_.readJson[A])
     }
 
     def readJsonWith[A](jsonReader: JsonReader[A])(implicit producer: TokenIteratorProducer): Either[ReaderError, A] = {

@@ -1,6 +1,6 @@
 package tethys.commons
 
-import tethys.JsonReader
+import tethys.{JsonReader, TokenIteratorOps}
 import tethys.commons.Token._
 import tethys.readers.ReaderError
 import tethys.readers.tokens.{QueueIterator, TokenIteratorProducer}

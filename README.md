@@ -4,12 +4,101 @@
 
 # tethys
 tethys is a JSON parsing/writing library for Scala
+# [Scala3] Quick start
 
-# benchmarks
+Add dependencies to your `build.sbt`
+
+```scala
+val tethysVersion = "latest version in badge | since 0.27.0"
+libraryDependencies ++= Seq(
+  "com.tethys-json" %% "tethys-core" % tethysVersion,
+  "com.tethys-json" %% "tethys-jackson" % tethysVersion
+)
+```
+or just
+
+```scala
+libraryDependecies ++= Seq(
+  "com.tethys-json" %% "tethys" % "latest version in badge"
+)
+```
+
+Also, tethys for Scala 3 has the following integrations:
+
+#### Json4s
+[see project page](https://github.com/json4s/json4s)
+```scala
+libraryDependencies += "com.tethys-json" %% "tethys-json4s" % tethysVersion
+```
+
+# core
+
+core module contains all type classes for parsing/writing JSON and derivation.
+JSON string parsing/writing is separated to `tethys-jackson`.
+
+## JsonWriter
+
+JsonWriter writes json tokens to `TokenWriter`
+
+```scala
+import tethys.*
+import tethys.jackson.*
+
+List(1, 2, 3, 4).asJson
+
+//or write directly to TokenWriter
+
+val tokenWriter = YourWriter
+
+tokenWriter.writeJson(List(1, 2, 3, 4))
+```
+
+New writers can be derived
+
+```scala
+import tethys.*
+import tethys.jackson.*
+
+case class Foo(bar: Int, baz: String) derives JsonWriter
+
+```
+
+New writers can be created with an object builder or with a combination of a few writers
+
+```scala
+import tethys.*
+import tethys.jackson.*
+import scala.reflect.ClassTag
+
+case class Foo(bar: Int)
+
+def classWriter[A](implicit ct: ClassTag[A]): JsonObjectWriter[A] =
+  JsonWriter.obj[A].addField("clazz")(_ => ct.toString())
+
+given JsonObjectWriter[Foo] =
+  classWriter[Foo] ++ JsonWriter.obj[Foo].addField("bar")(_.bar)
+
+Foo(1).asJson
+```
+
+
+or just using another JsonWriter
+
+```scala
+import tethys._
+
+case class Foo(bar: Int)
+
+JsonWriter[String].contramap[Foo](_.bar.toString)
+```
+
+
+
+# [Scala2] benchmarks
 
 [see here](./modules/benchmarks)
 
-# Quick start
+# [Scala 2] Quick start
 
 Add dependencies to your `build.sbt`  
 
